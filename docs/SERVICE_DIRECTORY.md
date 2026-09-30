@@ -1,9 +1,11 @@
 # ZPL Service Contracts and DNS Integration
 
-**Status: Proposal.** This document records the intended architecture, not
-implemented behavior and not yet a published RFC. Code changes to the compiler,
-policy schema, Visa Service API, or endpoint resolver must follow an adopted
-wire and compatibility specification.
+**Status: Architecture proposal; initial compiler and registry slices implemented.**
+This is not yet a published RFC. The compiler accepts a service declaration
+with one TCP/UDP port and emits its DNS name as the signed service ID. Visa
+Service tracks multiple provider addresses per service ID. DNS query serving,
+authenticated publication to a third-party backend, and bootstrap migration
+remain unimplemented.
 
 ## Motivation
 
@@ -43,29 +45,28 @@ remain deployment configuration, not policy semantics.
 ## ZPL Direction
 
 Retain `define` for policy classes and add a declaration for a service contract.
-Illustrative syntax only; it is not accepted by the current compiler:
+The initial compiler syntax is:
 
 ```zpl
 define PayrollAPI as a service with data-class:confidential.
-provide PayrollAPI at payroll.finance.svc.zpr over TCP/443.
+provide PayrollAPI at payroll.finance.svc.zpr over TCP 443.
 
 allow finance employees to access PayrollAPI.
 ```
 
-The declaration contributes the canonical service ID, DNS name, class, and
-transport scopes to the signed policy. Policy rules continue to authorize
-communication by attributes and service class; DNS names and addresses are
-not authorization predicates. The compiler rejects duplicate canonical names,
-invalid transport scopes, and definitions whose service class is not derived
-from `service`.
+The DNS name is normalized to lowercase and emitted as the service ID in the
+signed policy, with its transport scope. The initial implementation accepts one
+TCP or UDP port per declaration. Policy rules authorize communication by
+attributes and service class; DNS names are identifiers, not authorization
+predicates. The parser rejects duplicate class/name declarations, invalid DNS
+labels, unsupported protocols, invalid ports, and non-service classes.
 
-Exact grammar, service-name normalization, endpoint syntax, and policy-binary
-versioning require a public language/schema specification before compiler
-implementation. The example above must not be treated as valid ZPL yet.
+Service classes without `provide` continue to use legacy `.zplc`
+`[services.*]` configuration. That fallback exists for migration; new
+application service definitions should use ZPL.
 
 ## DNS Provider Integration
 
-DNS is itself a ZPR service, not an open network service. Clients reach its
 DNS is itself a ZPR service, not an open network service. Clients reach its
 query endpoint only over authenticated ZPR flows that active policy permits;
 registration and administration use separately authorized ZPR service
@@ -114,12 +115,13 @@ process or host failure does not leave a permanent answer. A policy change that
 removes a service or its provider authorization triggers record withdrawal.
 DNS TTLs must not exceed the remaining registration lease.
 
-The initial design should support multiple instances for one service ID.
-Resolution returns the live instance set; final instance selection does not
-grant access, and every resulting flow remains subject to Visa Service policy
-evaluation. An instance that cannot prove its service identity or its binding
-to the owning ZPR actor is not registrable. Adapter identity alone must not
-allow arbitrary services to be claimed.
+Visa Service now stores a set of provider ZPR addresses per service ID and
+removes only the departing or updated provider. Resolution should return the
+live instance set; final instance selection does not grant access, and every
+resulting flow remains subject to Visa Service policy evaluation. An instance
+that cannot prove its service identity or its binding to the owning ZPR actor is
+not registrable. Adapter identity alone must not allow arbitrary services to
+be claimed.
 
 ## Services and Bootstrap
 
@@ -176,8 +178,10 @@ bootstrap permissions.
 
 ## Implementation Sequence
 
-1. Specify the service declaration grammar, canonical naming, transport-scope
-  semantics, and a versioned policy representation.
+1. Extend the initial compiler declaration to multiple transport scopes and
+  publish the naming and policy-ID rules in the ZPL specification. The first
+  TCP/UDP single-port compiler slice and multi-provider actor registry are
+  implemented.
 2. Define the service identity and bootstrap model for Visa Service, attribute,
   policy, and DNS registration components. Specify local bootstrap policy and
   attributes, trust roots, remote policy verification, and transition/recovery.
@@ -218,9 +222,11 @@ in integration tests before the feature is described as available.
 
 ## Current Implementation Boundary
 
-The current compiler grammar defines classes but has no service-instance or
-DNS declaration. `.zplc` owns service transport configuration. Visa Service
-derives actor service IDs from policy-authorized admission, stores a
-service-ID-to-actor-address index, and advertises only authentication-service
-descriptors to nodes. It has no general service-registration API or DNS
-provider integration. There is no third-party DNS adapter in the current code.
+The compiler accepts `provide <class> at <dns-name> over TCP|UDP <port>`, emits
+the normalized DNS name as the signed service ID, and serializes the declared
+transport scope. Legacy `[services.*]` configuration remains supported.
+Visa Service derives actor service IDs from policy-authorized admission and
+stores each service ID's provider addresses in a set. Its authentication
+service advertisement consumes every registered provider. It does not yet
+serve DNS queries, publish records to a third-party DNS backend, or load
+operational policy/attributes over the network bootstrap sequence.

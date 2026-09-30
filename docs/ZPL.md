@@ -66,23 +66,24 @@ runtime because attribute values change.
 | **Trusted source** | Where attribute values come from, and the *only* place they come from. The attribute service caches them, refreshes on source-specified intervals, and honors change notifications. |
 | **Circumstance** | Like an attribute, but describing the state of affairs at communication time (clock time, recent data volume). Always resolved at runtime. |
 
-### Policy versus configuration
+### Policy and configuration
 
-ZPL deliberately holds no configuration. Everything
-installation-specific — static addresses, protocols, topology, trusted
-sources, which enforcement mechanism covers which part of the
-network — lives in the **configuration description** (the `.zplc` file). The
-compiler combines the two to emit enforcement rules per network region.
+Deployment-specific topology, substrate addresses, bootstrap trust material,
+and trusted-service connector settings remain in `.zplc`. Application service
+contracts are now declared in ZPL so their logical DNS identity and transport
+scope travel in the signed policy:
 
-That split is why the same policy text survives a re-addressing, a cloud
-migration, or a change of enforcement mechanism.
+```zpl
+define PayrollAPI as a service with device.zpr.adapter.cn:payroll.
+provide PayrollAPI at payroll.finance.svc.zpr over TCP 443.
+```
 
-**Proposed direction:** move logical application-service declarations and
-their protocol/port scopes into signed ZPL policy, while keeping deployment
-topology and bootstrap settings in `.zplc`. A policy-gated ZPR DNS service
-would publish live instances through a private third-party DNS backend.
-This changes the current language boundary and is not implemented; see [the
-service-contract and DNS-integration proposal](SERVICE_DIRECTORY.md).
+The initial compiler supports one TCP or UDP port per `provide` declaration;
+legacy `.zplc` application-service tables remain available during migration.
+Live registration and DNS serving are not implemented yet. The planned DNS
+endpoint is itself a ZPR service and will front a private third-party DNS
+backend under policy-gated ZPR access. See [the service-contract and
+DNS-integration proposal](SERVICE_DIRECTORY.md).
 
 ---
 
