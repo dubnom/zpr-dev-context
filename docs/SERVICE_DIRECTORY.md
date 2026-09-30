@@ -1,6 +1,6 @@
 # ZPL Service Contracts and DNS Integration
 
-**Status: Initial implementation in progress.** ZPL service declarations, multi-provider actor indexing, and a BIND 9 TSIG publisher are implemented. BIND runs as a ZPR service bound to its ZPR address, and Visa Service publishes policy-authorized provider addresses. Client-adapter DNS resolution and network bootstrap for policy/attributes remain future work. This design has not yet been published as an RFC.
+**Status: Initial implementation in progress.** ZPL service declarations, multi-provider actor indexing, a BIND 9 TSIG publisher, and an opt-in adapter loopback DNS stub are implemented. The stub forwards local UDP/TCP requests over TCP to one statically bootstrapped ZPR DNS address. Host resolver and route configuration remain operator-managed. This design has not yet been published as an RFC.
 
 ## Model
 
@@ -30,6 +30,8 @@ BIND 9 is the DNS server and runs as a ZPR endpoint. It binds DNS query service 
 
 The checked-in example is [the BIND deployment guide](../zpr-visaservice/dns/bind9/README.md). It includes an authoritative-only BIND configuration, a `svc.zpr` zone, and ZPL policy for authenticated clients and the Visa Service publisher. The DNS server's ZPR address must be bootstrapped because clients cannot use DNS to discover the server that provides DNS.
 
+An adapter can optionally expose a loopback-only DNS stub configured with `adapter.dns_proxy_listen` and `adapter.dns_proxy_server`. It accepts local UDP and TCP requests and always forwards over TCP to that one literal server address using a socket bound to the adapter TUN. It does not edit the host resolver, resolve public names, or fall back to an underlay resolver. Operators must configure the host resolver to use the loopback listener. DNS queries then follow ordinary ZPR flow and visa handling; connections to returned addresses still require separate authorization.
+
 ## Visa Service Publication
 
 Visa Service stores a set of provider ZPR addresses per service ID. On startup, actor join/leave, and policy update, it reconciles the BIND A/AAAA RRsets to the current desired provider set. A provider is published only when:
@@ -47,11 +49,11 @@ Configuration is optional and disabled by default. A deployment supplies the BIN
 
 The DNS actor's identity and ZPR address are bootstrap inputs. Start with a small local file policy, bootstrap keys, and initial attributes sufficient to bring up the Visa Service and DNS/attribute services. Once reachable, operational policy and attributes should be obtained from their authenticated network services; bootstrap permissions must not silently widen on failure.
 
-The next client phase is adapter integration: configure a ZPR DNS address as a resolver, send queries over the ZPR adapter, and ensure queries are policy-permitted. Client support must not fall back to an open underlay resolver for ZPR names. DNS answers remain candidates only; Visa Service policy evaluation authorizes actual flows.
+The initial adapter query path is available through the optional loopback stub. Remaining client work is safe platform-specific resolver and route provisioning, dynamic adapter-address/bootstrap integration, and an end-to-end test proving DNS queries and connections to returned addresses both traverse normal visa handling. DNS answers remain candidates only; Visa Service policy evaluation authorizes actual flows.
 
 ## Remaining Work
 
-- Add client-adapter DNS-over-TCP resolution to a bootstrapped ZPR DNS address; add UDP support when ZPL can express both transport scopes.
+- Add platform-specific route/resolver provisioning and end-to-end ZPR DNS flow tests; the local stub already translates UDP/TCP client requests to upstream TCP.
 - Provision the BIND TSIG key and zone through deployment tooling; validate `named.conf` and zone files with BIND's `named-checkconf`/`named-checkzone`.
 - Add a live BIND integration test for signed updates, RRset replacement, TTL expiry, wrong-key rejection, and policy/provider removal.
 - Specify the public service-name convention, multi-instance selection behavior, and recovery/rotation procedures.
