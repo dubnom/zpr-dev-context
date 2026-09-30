@@ -147,6 +147,7 @@ the one naming the configuration.
 | **Visa service** | Issues, distributes, and revokes visas; holds policy; admits endpoints. See [VISA_SERVICE.md](VISA_SERVICE.md). |
 | **Admin service** | Generates and distributes configurations, including topology and forwarding rules. |
 | **Trusted services** | External sources of authentication and attributes — LDAP, Active Directory, cloud services. Named in policy; the only sources ZPR will consult. |
+| **ZPR DNS service (proposed)** | A policy-gated ZPR endpoint fronts a private third-party DNS backend for leased service-instance records; it is not an open or public resolver, and DNS resolution does not authorize traffic. See [SERVICE_DIRECTORY.md](SERVICE_DIRECTORY.md). |
 
 ### What an adapter is and is not
 

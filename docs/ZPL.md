@@ -77,6 +77,13 @@ compiler combines the two to emit enforcement rules per network region.
 That split is why the same policy text survives a re-addressing, a cloud
 migration, or a change of enforcement mechanism.
 
+**Proposed direction:** move logical application-service declarations and
+their protocol/port scopes into signed ZPL policy, while keeping deployment
+topology and bootstrap settings in `.zplc`. A policy-gated ZPR DNS service
+would publish live instances through a private third-party DNS backend.
+This changes the current language boundary and is not implemented; see [the
+service-contract and DNS-integration proposal](SERVICE_DIRECTORY.md).
+
 ---
 
 ## Language reference
