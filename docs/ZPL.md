@@ -80,10 +80,10 @@ provide PayrollAPI at payroll.finance.svc.zpr over TCP 443.
 
 The initial compiler supports one TCP or UDP port per `provide` declaration;
 legacy `.zplc` application-service tables remain available during migration.
-Live registration and DNS serving are not implemented yet. The planned DNS
-endpoint is itself a ZPR service and will front a private third-party DNS
-backend under policy-gated ZPR access. See [the service-contract and
-DNS-integration proposal](SERVICE_DIRECTORY.md).
+Visa Service publishes policy-authorized provider addresses to BIND 9 over ZPR
+using TSIG. BIND runs as a ZPR service bound to its ZPR address, and its query
+access is policy-gated; client-adapter DNS resolution remains future work. See
+[the service-contract and DNS-integration proposal](SERVICE_DIRECTORY.md).
 
 ---
 
