@@ -300,10 +300,18 @@ peer — the caller may reset the link on those.
 
 ### Link and docking-session bring-up
 
-Docking sessions are **always initiated by the adapter** (6.4 §5.6): the dock
+Docking sessions are **always initiated by the adapter** (RFC 17): the dock
 platform serves many adapters, adapters often have no fixed substrate address,
-and probing would be wasteful and noisy. For node-to-node links, whichever node
-has the numerically smaller node number initiates.
+and probing would be wasteful and noisy. For node-to-node links, if the keying
+protocol requires one initiator, the node with the numerically smaller Node
+Address (compared as an unsigned integer) initiates; the other waits. Each Node
+then sends a Hello Request and responds to the peer's Hello Request. See
+[`MULTI_NODE_LINK_CONTRACT.md`](MULTI_NODE_LINK_CONTRACT.md) for the current
+implementation gaps and the unresolved parts of the RFC.
+
+The RFC 17 source currently available in this workspace is downloaded from the
+public `sj/upload-17` branch, not `main`; verify that it is the intended
+authoritative revision before implementation.
 
 The sequence is: keying (Noise) → `Hello` Request/Response → address
 registration → `Echo` keep-alives. A Hello Response may accept, reject, or
@@ -312,9 +320,12 @@ initiated or accepted.
 
 `link_state.rs` models this as an FSM. States: `Inactive`, `Keying`,
 `Helloing`, `WaitForInitAuth`, `WaitForAcquireZprAddress`, `RegisterAA`,
-`Active`, `Closing`, `Resetting`, `Disconnecting`, `Error`. Link types:
-`Internal`, `AdapterToNode`, `NodeToAdapter`, and `NodeToNode` — the last
-marked *currently unsupported*.
+`Active`, `Closing`, `Resetting`, `Disconnecting`, `Error`. Link types are
+`Internal`, `AdapterToNode`, `NodeToAdapter`, and `NodeToNode`. NodeToNode
+startup is supported for peers supplied by the authenticated Visa Service and
+locally pinned by Noise certificate; see
+[`MULTI_NODE_LINK_CONTRACT.md`](MULTI_NODE_LINK_CONTRACT.md) for the remaining
+end-to-end gaps.
 
 Keep-alive is `Echo` every `DEFAULT_KEEP_ALIVE_PERIOD = 3 s` with a matching
 3-second timeout; `LINK_HELLO_TIMEOUT = 3 s`, restart holddown 5 s.
@@ -393,10 +404,12 @@ dropped.
 
 Specified, not implemented:
 
-- **Node-to-node links.** `LinkType::NodeToNode` is *currently unsupported*;
-  integration tests are `one-node-test.sh` and `one-node-v6-test.sh`. Multi-hop
-  forwarding, visa heralding, next-hop selection (6.4 §5.11.2), and route
-  distribution (§5.12) are therefore unexercised.
+- **Node-to-node links.** Configured peer startup, pinned Noise keying,
+  bidirectional Hello, Echo liveness, and stale-peer removal on `SetTopology`
+  are implemented. There is no two-node integration test or Visa Service
+  link-state report, so live-edge status, multi-hop forwarding, visa heralding,
+  next-hop selection (6.4 §5.11.2), and route distribution (§5.12) remain
+  unverified or unimplemented.
 - **Substrates other than IP/UDP** — raw links, PPP, bare Ethernet.
 - **ZARP** (6.4 §3.3.1) — type 128 reserved, no implementation.
 - **IKEv2** — constant only; Noise is what runs.

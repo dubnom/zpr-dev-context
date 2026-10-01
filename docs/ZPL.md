@@ -80,6 +80,11 @@ provide PayrollAPI at payroll.finance.svc.zpr over TCP 443.
 
 The initial compiler supports one TCP or UDP port per `provide` declaration;
 legacy `.zplc` application-service tables remain available during migration.
+ZRFC 15 also defines a transitional `service <name> as json <object>.`
+statement for embedding an existing service JSON record. The compiler validates
+its `service_class` and retains the object in the parsed policy, but does not
+map its fields into signed policy; use `provide` or legacy `.zplc` configuration
+for transport scope.
 Visa Service publishes policy-authorized provider addresses to BIND 9 over ZPR
 using TSIG. BIND runs as a ZPR service bound to its ZPR address, and its query
 access is policy-gated; client-adapter DNS resolution remains future work. See
