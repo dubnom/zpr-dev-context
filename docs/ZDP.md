@@ -406,10 +406,10 @@ Specified, not implemented:
 
 - **Node-to-node links.** Configured peer startup, pinned Noise keying,
   bidirectional Hello, Echo liveness, and stale-peer removal on `SetTopology`
-  are implemented. There is no two-node integration test or Visa Service
-  link-state report, so live-edge status, multi-hop forwarding, visa heralding,
-  next-hop selection (6.4 §5.11.2), and route distribution (§5.12) remain
-  unverified or unimplemented.
+  are implemented. Nodes report peer state through VSAPI, and the Visa Service
+  gates live router edges on both endpoint reports. There is no two-node
+  integration test, so multi-hop forwarding, visa heralding, next-hop selection
+  (6.4 §5.11.2), and route distribution (§5.12) remain unverified.
 - **Substrates other than IP/UDP** — raw links, PPP, bare Ethernet.
 - **ZARP** (6.4 §3.3.1) — type 128 reserved, no implementation.
 - **IKEv2** — constant only; Noise is what runs.

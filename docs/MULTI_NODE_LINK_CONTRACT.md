@@ -269,7 +269,8 @@ liveness. The peer-table lookup distinguishes preconfigured Node peers from
 unknown adapter tethers. Topology-carried bootstrap visas are sent in the
 existing `BOOTSTRAP_VISA` Hello TLV and installed only when their endpoints
 name the authenticated peer. Still missing are two-node integration tests,
-node-to-Visa-Service link-status reporting, topology `UP` gating on actual link
-state at both endpoints, and end-to-end route/visa validation. Node-to-node
-unbind handling also remains incomplete. The separate OCI multi-node demo is
+end-to-end route/visa validation, and node-to-node unbind handling. The new
+`reportLinkStatus` RPC validates each endpoint's policy link ID and gates the
+persisted router edge on fresh up reports from both Nodes; service startup
+clears restored edges until they report. The separate OCI multi-node demo is
 out of scope for this standard ZPR milestone.

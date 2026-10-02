@@ -62,6 +62,12 @@ If Cargo's built-in Git client fails to authenticate, have it shell out to
 export CARGO_NET_GIT_FETCH_WITH_CLI=true
 ```
 
+During the in-flight VSAPI/link-status development bump, `zpr-core` and
+`zpr-visaservice` use the sibling `../zpr-common` path at version `0.25.2` so
+the coordinated schema and consumers build from one checkout. Once `v0.25.2`
+is published, those two dependencies should return to the Git tag form used by
+the other repositories.
+
 Go work additionally needs:
 
 ```bash
