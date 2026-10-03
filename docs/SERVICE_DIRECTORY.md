@@ -19,7 +19,7 @@ The compiler accepts one TCP or UDP port per declaration:
 ```zpl
 define PayrollAPI as a service with device.zpr.adapter.cn:payroll.
 provide PayrollAPI at payroll.finance.svc.zpr over TCP 443.
-allow finance employees to access PayrollAPI.
+	allow finance employees.
 ```
 
 The DNS name is normalized to lowercase and becomes the service ID in signed policy. The compiler rejects duplicate class/name declarations, invalid DNS labels, unsupported protocols, invalid ports, and non-service classes. The optional internal `zpr.addr` attribute may pin a service endpoint to an assigned ZPR address; the value must match the address on which that service listens. Legacy `.zplc` `[services.*]` tables remain temporarily supported for migration.

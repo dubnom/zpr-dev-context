@@ -322,8 +322,9 @@ is the two-node deployment being built out against this gap.
 ZPL's `over` clause constrains which links a flow may traverse:
 
 ```zpl
-allow redhead users to access database over secure, location:usa links.
-never allow baldy users to access database over foreign links.
+provide Database at database.svc.zpr over TCP 5432.
+  allow redhead users over secure, location:usa links.
+  never allow baldy users over foreign links.
 ```
 
 The full pipeline exists in outline and is disconnected at every runtime joint:
@@ -351,9 +352,10 @@ hits. The two-phase split exists because the answer depends on which
 permission matched —
 
 ```zpl
-allow admins to access services over secure links.
-allow employees to access services.          # implied: over any link
-never allow admins to access services over insecure links.
+provide ApplicationAPI at application.svc.zpr over TCP 443.
+  allow admins over secure links.
+  allow employees.          # implied: over any link
+  never allow admins over insecure links.
 ```
 
 — so evaluating a route requires knowing whether the actor matched as an admin
