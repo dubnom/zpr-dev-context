@@ -43,9 +43,10 @@ by a permission; anything not permitted is denied by default.
     description)
 ```
 
-**Permissions are additive.** Each statement's consequences can be understood
-without reading any other statement, which is what lets independent teams
-compile policy sections separately and combine the results.
+**Permissions are additive after service binding.** A rule's target comes from
+the `provide` group immediately above it, so source order is significant.
+Independent policy sections must keep their service declaration and its rules
+together when composed; a bare access rule is not a self-contained section.
 
 **Denials are statements of intent**, written with `never`. They apply to the
 combined policy of the whole ZPRnet and override any contradictory permission.
@@ -95,19 +96,25 @@ access is policy-gated; client-adapter DNS resolution remains future work. See
 ## Language reference
 
 A policy is a sequence of statements. Each begins on a new line and ends with
-a period followed by a newline or end of file. **Statement order does not
-matter.** Blank lines, comment-only lines, and indentation are insignificant,
+a period followed by a newline or end of file. **Statement order matters.**
+`provide` establishes the service targeted by the following contiguous `allow`
+and `never allow` rules. Another `provide` establishes a new target; `define` or
+embedded `service ... as json` ends the active group. Rules outside such a group
+are invalid. Blank lines, comment-only lines, and indentation are insignificant,
 and a statement may span lines — but two statements may never share a line.
 
 ```zpl
 # Comments run to end of line, with # or //.
-allow sales employees on managed laptops to access customer databases.
+provide CustomerDatabase at customers.svc.zpr over TCP 443.
+allow sales employees on managed laptops.
 ```
 
 ### Keywords
 
 `allow`, `never`, `define`, `as`, `aka`, `with`, `to`, `access`, `on`, `over`,
-`and`, `signal`, `tag`, `tags`, `optional`, `multiple`. A comma reads as `and`.
+`and`, `signal`, `tag`, `tags`, `optional`, `multiple`, `provide`, `at`.
+A comma reads as `and`. `to access` is no longer permitted in an access rule;
+`to` remains valid for a signal destination.
 
 Keywords are **case-insensitive** (`ALLOW` == `allow`). `a` and `an` are
 dropped wherever they appear — they exist purely so statements read as English.
@@ -186,38 +193,43 @@ and there are no link subclasses.
 ### `allow` — permissions
 
 ```zpl
-allow sales employees to access customer databases.
-allow sales employees on managed laptops to access customer databases.
-allow department:sales employees on managed laptops to access customer databases.
-allow HR employees to access Timesheet-database.
+provide CustomerDatabase at customers.svc.zpr over TCP 443.
+allow sales employees.
+allow sales employees on managed laptops.
+allow department:sales employees on managed laptops.
+provide TimesheetDatabase at timesheets.svc.zpr over TCP 443.
+allow HR employees.
 ```
 
 The subject is a user, service, or device spec, optionally `on` a device spec;
-the object is a service spec, optionally `on` a device spec. Within a spec the
+the target is the service of the enclosing `provide` group. Within a spec the
 class name may come before or after the attributes, and at most one class name
 may appear — `cleared and government user`, `cleared, government user`, and
 `cleared government user` are the same thing.
 
-**`on` is positional.** Before `to access` it constrains the *accessor's*
-device; after `to access` and a service clause it constrains the device of the
-thing *being accessed*:
-
-```zpl
-allow sales employees to access customer databases on sales devices.
-```
+**`on` constrains only the accessor's device.** Provider-device restrictions
+belong in the declared service class, such as `device.department:sales`.
+All named classes in these examples are assumed to be defined before the groups.
+Explicit access targets are forbidden, including a repetition of the current
+service. A class may have only one `provide` declaration, so keep its rules
+together. Ordering binds targets; it does not establish first-match priority.
 
 Each hop is permissioned separately. A load-balanced service needs both:
 
 ```zpl
-allow cleared government users to access Timesheet-load-balancer.
-allow Timesheet-load-balancer to access Timesheet-database.
+provide TimesheetLoadBalancer at timesheets.svc.zpr over TCP 443.
+allow cleared government users.
+provide TimesheetDatabase at timesheet-db.svc.zpr over TCP 5432.
+allow TimesheetLoadBalancer.
 ```
 
 ### `over` — link constraints
 
 ```zpl
-allow sales employees to access customer databases over secure links.
-allow finance users to access payroll-services over location:usa links.
+provide CustomerDatabase at customers.svc.zpr over TCP 443.
+allow sales employees over secure links.
+provide PayrollAPI at payroll.svc.zpr over TCP 443.
+allow finance users over location:usa links.
 ```
 
 The statement applies only if a permitted path exists whose links *all* satisfy
@@ -237,33 +249,42 @@ At most one `over` clause per statement, before any signal clause.
 ### `never` — denials
 
 ```zpl
-never allow internet-gateways to access internal services.
-never allow role:intern users to access classified services.
-never allow regulated services to access backup-services over foreign links.
+provide InternalAPI at internal.svc.zpr over TCP 443.
+never allow internet-gateways.
+provide ClassifiedAPI at classified.svc.zpr over TCP 443.
+never allow role:intern users.
+provide BackupAPI at backup.svc.zpr over TCP 443.
+never allow regulated services over foreign links.
 ```
 
-Same shape as `allow` with `never` in front. (`never` rather than `deny`,
+Same shape and ordered service scope as `allow`, with `never` in front. Denials
+override permissions for the bound service; they do not target all services.
+(`never` rather than `deny`,
 because it reads as English and because `deny` means different things in other
 policy languages.)
 
 ### `signal` — reporting on match
 
 ```zpl
-allow top-secret users to access top-secret services and signal "accessing" to Access-logger.
+provide ClassifiedAPI at classified.svc.zpr over TCP 443.
+allow top-secret users and signal "accessing" to Access-logger.
 ```
 
 Sends the message plus the identities of every entity involved to a named
 service when the communication is initiated. Only the statement that actually
 allows or denies the access signals, not every statement that could have. The
 signal clause comes last; nothing may follow it.
+The `to Access-logger` reporting destination does not change the access target.
 
 ### Circumstances — **not yet implemented**
 
 ZRFC 15 describes runtime conditions and limits:
 
 ```zpl
-never allow backup:nightly servers to access backup-services before 18:00 GMT.
-allow Service2 access to Service1, limited to 10Gb/day.
+provide BackupAPI at backup.svc.zpr over TCP 443.
+never allow backup:nightly servers before 18:00 GMT.
+provide Service1 at service1.svc.zpr over TCP 443.
+allow Service2, limited to 10Gb/day.
 ```
 
 The RFC notes the syntax is not fully defined, and the compiler rejects both.
@@ -363,8 +384,8 @@ Documented in ZRFC 15, **not yet in the compiler**:
   the compiler accepts a decimal only in value position and requires digits on
   both sides of the point.
 - **Negation (`without`) and attribute sourcing (`from`)** — both are reserved
-  prepositions in the lexer, not keywords. `allow users without role:intern
-  to access internal services.` and `define employee as a user with multiple
+  prepositions in the lexer, not keywords. `allow users without role:intern.`
+  inside a service group and `define employee as a user with multiple
   roles from ActiveDirectory.` do not compile. See
   `test-data/rfc15-006-todo.zpl` and `rfc15-012-todo.zpl`.
 
