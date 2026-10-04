@@ -8,6 +8,9 @@ repository should see.
 `zpr-dev/docs/specs/` (`spec-001-zpr-dev.md` for the tool as built,
 `spec-000-parent.md` for the original design record).
 
+Current implementation roadmap progress and open acceptance gaps are tracked in
+[docs/IMPLEMENTATION_PROGRESS.md](docs/IMPLEMENTATION_PROGRESS.md).
+
 ## `zpr-dev`
 
 `zpr-dev` makes the workspace reproducible. It clones the repository set listed
