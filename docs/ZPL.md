@@ -113,8 +113,9 @@ allow sales employees on managed laptops.
 
 `allow`, `never`, `define`, `as`, `aka`, `with`, `to`, `access`, `on`, `over`,
 `and`, `signal`, `tag`, `tags`, `optional`, `multiple`, `provide`, `at`.
-A comma reads as `and`. `to access` is no longer permitted in an access rule;
-`to` remains valid for a signal destination.
+A comma reads as `and`. The bare phrase `to access` is optional after an access
+rule's subject and is assumed when omitted. It does not take a service target;
+`to` also remains valid for a signal destination.
 
 Keywords are **case-insensitive** (`ALLOW` == `allow`). `a` and `an` are
 dropped wherever they appear — they exist purely so statements read as English.
@@ -195,6 +196,7 @@ and there are no link subclasses.
 ```zpl
 provide CustomerDatabase at customers.svc.zpr over TCP 443.
 allow sales employees.
+allow sales employees to access.
 allow sales employees on managed laptops.
 allow department:sales employees on managed laptops.
 provide TimesheetDatabase at timesheets.svc.zpr over TCP 443.
@@ -213,6 +215,11 @@ All named classes in these examples are assumed to be defined before the groups.
 Explicit access targets are forbidden, including a repetition of the current
 service. A class may have only one `provide` declaration, so keep its rules
 together. Ordering binds targets; it does not establish first-match priority.
+
+The optional words `to access` follow the complete subject (including any `on`
+device clause) and precede any `over` or signal clause. Omitting them has exactly
+the same meaning: `allow sales employees.` and `allow sales employees to access.`
+both grant access to the enclosing service. The same rule applies to `never allow`.
 
 Each hop is permissioned separately. A load-balanced service needs both:
 

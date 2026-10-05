@@ -2,8 +2,9 @@
 
 Last updated: **2026-10-04**.
 
-This is the tracked current-progress companion to the workspace-level public
-implementation roadmap. Checked items mean implemented local capabilities,
+This is the tracked current-progress companion to the
+[public implementation roadmap](IMPLEMENTATION_ROADMAP.md).
+Checked items mean implemented local capabilities,
 not production readiness, published standards conformance, or clean-checkout
 CI acceptance.
 
