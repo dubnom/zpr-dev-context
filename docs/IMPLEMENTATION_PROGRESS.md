@@ -1,6 +1,6 @@
 # Implementation Roadmap Progress
 
-Last updated: **2026-10-04**.
+Last updated: **2026-10-05**.
 
 This is the tracked current-progress companion to the
 [public implementation roadmap](IMPLEMENTATION_ROADMAP.md).
@@ -33,6 +33,11 @@ CI acceptance.
 - [x] Reuse adapter/controller log panels with per-source selection and scroll
   memory; simplify Control Room controls without changing simulator log controls.
 - [x] Add independently persisted collapsible navigation and responsive UI checks.
+- [x] Add Activity tables with sortable Visa/denial columns and request totals;
+  group Control Room status pages into counted tabs while keeping summary metrics
+  on Map. Map Fit uses rendered bounds and topology updates honor reduced motion.
+- [x] Use Device terminology in Simulator inventory, group unfiled scenarios,
+  and clear only terminal run history without changing scenario definitions/logs.
 - [ ] Complete per-record authorization, attributable audit, retention,
   backup/recovery, and certificate/key rotation before shared or production use.
 
@@ -82,3 +87,10 @@ results are local snapshots, not release certification.
 
 See [ZPL](ZPL.md), [security model](SECURITY_MODEL.md), and
 [multi-node link contract](MULTI_NODE_LINK_CONTRACT.md) for design and open gaps.
+
+The 2026-10-05 dashboard Go suite, compiler suite (294 unit tests and 11
+integration tests), ShellCheck, and focused policy/Analyze browser tests pass.
+The full desktop browser run had 58 passes and 5 failures covering assertion
+record visibility/revision expectations, picker focus restoration, historical
+revision visibility, and adapter-log retention after organization changes.
+Resolve these regressions before claiming a green full browser suite.

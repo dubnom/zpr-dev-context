@@ -357,6 +357,15 @@ availability claims are demonstrated by fault-injection tests.
 - [x] Add separately persisted collapsible navigation for Control Room and
   Simulator and remove redundant explanatory blocks from trusted-source views;
   exercise responsive layouts with desktop/mobile browser checks.
+- [x] Add a sortable Activity view for recent Visa Service grants and denials,
+  counted Control Room status tabs, and map-only summary metrics. Preserve
+  rendered topology bounds during Fit and animate retained components unless
+  reduced motion is requested.
+- [x] Use device terminology in the Simulator inventory, group unfiled scenarios
+  explicitly, and allow clearing only completed/cancelled run history.
+- [ ] Resolve current full-desktop browser regressions in assertion-record
+  visibility, picker focus/history visibility, and adapter-log retention; keep
+  clean-checkout browser CI acceptance open until the complete suite passes.
 - [ ] Add a consistent, accessible help system across Control Room and
   Simulator. Provide page- and task-specific guidance for common workflows,
   explain consequential actions such as policy staging and organization
