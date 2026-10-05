@@ -45,6 +45,32 @@ CI acceptance.
   an active peer link is not sufficient acceptance.
 - [ ] Confirm clean-checkout browser CI and add real-backend/network acceptance.
 
+## Denied-Flow Backoff
+
+- [x] Add a node-authoritative negative-decision cache with node-TOML
+  `denied_flow_backoff_ms` (default 1000, zero disables, maximum 60000). Entries
+  are keyed by ingress link, source/destination addresses, protocol, and
+  destination port; source-port changes do not bypass an entry.
+- [x] Check for an active positive visa first. On an explicit Visa Service
+  denial, cache the result and complete matching binds with the same successful
+  discard binding. Do not cache timeouts, VS errors, or other indeterminate
+  results; in-flight requests are not reserved or coalesced.
+- [x] Bound the cache globally and per ingress link, use monotonic expiries, and
+  report local suppression with a separate management counter.
+- [x] Preserve the no-policy-oracle contract: policy denials return success with
+  a reusable blackhole stream, whose packets are silently discarded. The
+  backoff interval is never exposed to the Adapter.
+- [x] Test cache key scope, expiry, capacity, configuration bounds, and reuse and
+  last-unbind cleanup of the blackhole stream.
+- [x] Add a real-VS denial/retry scenario to the one-node integration harness.
+  It asserts two denied binds with distinct source ports produce one Visa
+  request and one local backoff hit. The script passes `bash -n`; runtime
+  execution still requires the Linux network-namespace test environment.
+- [ ] Nodes receive no policy-generation or attribute-revision invalidation
+  signal today. A policy change can therefore remain locally denied until the
+  configured TTL expires (at most 60 seconds); add an authenticated invalidation
+  or versioned decision mechanism before relying on longer backoffs.
+
 ## Verification Notes
 
 Local regression checks cover compiler behavior, dashboard Go tests, and
