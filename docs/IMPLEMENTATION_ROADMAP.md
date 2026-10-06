@@ -363,6 +363,15 @@ availability claims are demonstrated by fault-injection tests.
   reduced motion is requested.
 - [x] Use device terminology in the Simulator inventory, group unfiled scenarios
   explicitly, and allow clearing only completed/cancelled run history.
+- [x] Keep source-located policy compiler/evaluator warnings in the line gutter;
+  show fixture failures without source locations in the status area rather than
+  assigning them to line 1. Cover warning/result coexistence on desktop/tablet.
+- [ ] Add unified Control Room logs and stats for every configured ZPR node and
+  trusted/required Visa Service dependency. Standardize ingestion on
+  OpenTelemetry and expose a provider-neutral catalog/query contract through
+  Control-Service; OpenObserve is the initial replaceable backend. Keep source
+  credentials server-side, output bounded/redacted, and operation independent of
+  Simulator. Test freshness, unavailable sources, and each source class.
 - [ ] Resolve current full-desktop browser regressions in assertion-record
   visibility, picker focus/history visibility, and adapter-log retention; keep
   clean-checkout browser CI acceptance open until the complete suite passes.

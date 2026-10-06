@@ -30,6 +30,9 @@ CI acceptance.
   and trusted-source browsers with approved LDAP attribute views.
 - [x] Add policy-picker context menus and record lifecycle operations with
   protected/archive and unsaved-edit checks.
+- [x] Keep source-located policy compiler/evaluator warnings in the line gutter;
+  show fixture failures without source locations in the status area rather than
+  assigning them to line 1. Cover warning/result coexistence on desktop/tablet.
 - [x] Reuse adapter/controller log panels with per-source selection and scroll
   memory; simplify Control Room controls without changing simulator log controls.
 - [x] Add independently persisted collapsible navigation and responsive UI checks.
@@ -38,6 +41,11 @@ CI acceptance.
   on Map. Map Fit uses rendered bounds and topology updates honor reduced motion.
 - [x] Use Device terminology in Simulator inventory, group unfiled scenarios,
   and clear only terminal run history without changing scenario definitions/logs.
+- [ ] Unified node/trusted-service logs and stats are not implemented. The
+  intended design standardizes ingestion on OpenTelemetry and places a
+  provider-neutral catalog/query contract behind Control-Service, with
+  OpenObserve as the initial replaceable backend. Current Adapter Logs,
+  Simulator Workload logs, and the Visa Service collector remain narrower.
 - [ ] Complete per-record authorization, attributable audit, retention,
   backup/recovery, and certificate/key rotation before shared or production use.
 
