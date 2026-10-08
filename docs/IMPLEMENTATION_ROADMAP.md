@@ -375,13 +375,14 @@ availability claims are demonstrated by fault-injection tests.
 - [ ] Resolve current full-desktop browser regressions in assertion-record
   visibility, picker focus/history visibility, and adapter-log retention; keep
   clean-checkout browser CI acceptance open until the complete suite passes.
-- [ ] Add a consistent, accessible help system across Control Room and
+- [x] Add a consistent, accessible help system across Control Room and
   Simulator. Provide page- and task-specific guidance for common workflows,
   explain consequential actions such as policy staging and organization
   switching before confirmation, and surface recovery steps for expected
   service/runtime failures. Link concise in-app guidance to the authoritative
   component docs; support keyboard and screen-reader use, avoid blocking normal
-  work, and test help visibility/content on desktop and mobile.
+  work, and test help visibility/content on desktop and mobile. Verified on
+  desktop and tablet browser projects, including mobile-sized layouts.
 - [x] Show an adapter's complete current unexpired visa list from its map
   inspector, beyond the recent-ten snapshot limit. Distinguish empty lists
   from failures; show flow, protocol, expiry, node, and policy. These are
