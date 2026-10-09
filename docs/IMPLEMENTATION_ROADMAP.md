@@ -5,8 +5,14 @@ implementation**, based on the checked-out `org-zpr` repositories and their
 public documentation. It is a durable working plan, not a claim that every
 design feature is already specified or production-ready.
 
-Last updated: **2026-10-05**. Checked items below distinguish implemented local
+Last updated: **2026-10-09**. Checked items below distinguish implemented local
 capabilities from still-open clean-checkout, CI, and production acceptance work.
+
+Current reconciliation is summarized in
+[Implementation progress](IMPLEMENTATION_PROGRESS.md). Local editor deployment,
+Gateway draft validation and geographic certification are complete; forwarding
+consolidation is committed source only. Remote release, clean-checkout CI,
+runtime Gateway activation and scaling acceptance remain open.
 
 The tracked current-progress companion is
 [`IMPLEMENTATION_PROGRESS.md`](IMPLEMENTATION_PROGRESS.md).
@@ -248,6 +254,11 @@ processes rather than only isolated functions.
   as a public deployment contract before publishing administrative UIs.
   Production rollout remains deferred; current application listeners are
   loopback-only.
+- [x] Implement local direct-HTTPS operator login with configured OIDC,
+  issuer/subject-scoped organization/permission grants, CSRF/session controls
+  and signed named-user enrollment delegation. Provisioning invitations,
+  key-bound claim/status and review foundations are implemented; public
+  deployment and clean-machine live admission remain separate acceptance gates.
 - [x] Implement an optional host-side browser mTLS gateway for Control Room
   and simulator with a dedicated browser-client CA and loopback upstreams.
   It is separate from the ZPR internet-gateway actor and is not enabled in the
@@ -268,6 +279,12 @@ and protected to the level claimed by the security model.
 adapter is still **Helloing**, so the demo is not fully healthy. The main
 simulator remains one synchronized forwarding node with no inter-node links.
 This snapshot does not establish cross-node traffic or recovery acceptance.
+
+**Later local verification (2026-10-08/09):** Great Lakes was restored with
+three synchronized nodes after authenticated Redwood two-node World Map
+certification. The unified editor deployment kept Great Lakes runtime start
+times unchanged. This supersedes the older local-health snapshot above, not the
+still-open CI, cross-node security or failure-recovery acceptance gates.
 
 - [ ] Specify versioned configuration identity and implement concurrent
   configuration transition: validate/test, activate, stop admitting new flows
@@ -319,6 +336,19 @@ availability claims are demonstrated by fault-injection tests.
 ## Phase 5: End-to-End Verification and Release Readiness
 
 **Owners:** all implementation repositories, `zpr-demo`, `zpr-dev-tools`.
+
+- [x] Deploy shared editor controllers across all six source editors, with
+  source/context-owned diagnostics, File/History, dirty guards, shortcuts and
+  responsive viewport/Maximize behavior. Preserve production/Simulator service
+  boundaries and the existing backend deployment snapshot.
+- [x] Implement production World Map coordinates and shared geographic/topology
+  rendering with local Great Lakes/Redwood browser certification. Newer visual
+  follow-ups remain in the GUI tracker; this is not CI certification.
+- [x] Implement Gateway Form/Raw drafts, seven-method Analyze and revision Save
+  without runtime activation. Implement/test forwarding consolidation in source.
+- [ ] Deploy and certify the consolidated forwarding runtime and reviewed
+  configuration activation/rollback; do not claim saved methods/paths are
+  enforced inside opaque CONNECT tunnels.
 
 - [x] Add a repeatable offline dashboard browser suite for implemented behavior:
   regressions on desktop and mobile cover log radios, follow/scroll memory,

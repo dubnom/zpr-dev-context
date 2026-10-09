@@ -1,6 +1,6 @@
 # Implementation Roadmap Progress
 
-Last updated: **2026-10-05**.
+Last updated: **2026-10-09**.
 
 This is the tracked current-progress companion to the
 [public implementation roadmap](IMPLEMENTATION_ROADMAP.md).
@@ -24,6 +24,28 @@ CI acceptance.
 
 ## Operator Workflows
 
+- [x] Deploy unified shared controllers for Policy, Assertions, ZPR Config,
+  Gateways, Simulator Directory and Scenario: File/History, identity, dirty
+  guards, shortcuts, request ownership, diagnostics and viewport/Maximize.
+  Control Room and Simulator use `zpr-editor-ui:20261009-unified`; the build
+  preserves the deployed 04:33 UTC backend and seven-method draft validator.
+- [x] Add production World Map metadata/projection, shared graph controls and
+  network-bounds Fit, with local authenticated Great Lakes and Redwood
+  certification. Restore Great Lakes after the second-organization check.
+  This is local acceptance, not clean-checkout CI or tenant isolation.
+- [x] Add organization-scoped Gateway Form/Raw drafts with expected-revision
+  saves, exact-source diagnostics and automatic Analyze-before-Save. Support
+  GET, HEAD, POST, PUT, PATCH, DELETE and OPTIONS; no runtime activation.
+- [x] Implement and test fixed-upstream seven-method/body forwarding and
+  shared neutral forwarding helpers. Committed in `24fbf5f`, not deployed;
+  the active Great Lakes HTTP/HTTPS-tunnel proxy already forwards these methods.
+- [ ] Deploy the source-only Gateway forwarding changes and connect approved
+  runtime configuration to the editor through reviewed activation/rollback.
+  Method/path enforcement inside opaque HTTPS tunnels remains a design gap.
+- [ ] Complete the newer World Map Fit/layout/background follow-ups, ZPR Config
+  form editor, organization creation/workspaces and worker log previews tracked
+  in [GUI work](../../zpr-visaservice/GUI%20work.md).
+
 - [x] Test candidate policies with compiler/ZPT evaluation and bounded fixtures;
   show per-rule matches, full dimension labels, and the first 100 unique members.
 - [x] Provide report-only trusted-data assertions and read-only policy/assertion
@@ -44,8 +66,9 @@ CI acceptance.
 - [ ] Unified node/trusted-service logs and stats are not implemented. The
   intended design standardizes ingestion on OpenTelemetry and places a
   provider-neutral catalog/query contract behind Control-Service, with
-  OpenObserve as the initial replaceable backend. Current Adapter Logs,
-  Simulator Workload logs, and the Visa Service collector remain narrower.
+  OpenObserve as the initial replaceable backend. Diagnostics and existing
+  Adapter/Workload logs are implemented narrower views; they do not establish
+  complete node/trusted-service coverage, durable retention or scale acceptance.
 - [ ] Complete per-record authorization, attributable audit, retention,
   backup/recovery, and certificate/key rotation before shared or production use.
 
@@ -86,6 +109,17 @@ CI acceptance.
   or versioned decision mechanism before relying on longer backoffs.
 
 ## Verification Notes
+
+Latest recorded local verification: Gateway race tests, Go vet and executable
+build pass; the full dashboard Go suite still fails the Redwood LDAP fixture
+(53 identities versus 53 people plus 3 machines expected). Unified editor
+verification reported 261 passing desktop/tablet cases and an isolated 22-case
+rerun resolving trace-cleanup failures. Authenticated Gateway checks passed on
+desktop/tablet. These snapshots do not supersede clean-checkout CI gates or prove
+all older browser failures resolved. Deployment preserved Control-Service,
+Policy-Service, DNS and Great Lakes runtime containers; stopped UI rollback
+containers were retained. The temporary reconstruction build directory was
+removed after deployment.
 
 Local regression checks cover compiler behavior, dashboard Go tests, and
 desktop/mobile browser workflows. The 2026-10-04 commit checks passed 288
